@@ -14,6 +14,7 @@ export const connectToDB=async()=>{
     dbName:"share_prompts",
     useNewUrlParser:true,
     useUnifiedTopology:true,
+    
 })
 isConnected=true;
 console.log("Mongodb connected");
