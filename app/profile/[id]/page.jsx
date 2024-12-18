@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-
 import Profile from "@components/Profile";
 
 const UserProfile = ({ params }) => {
@@ -10,22 +9,38 @@ const UserProfile = ({ params }) => {
   const userName = searchParams.get("name");
 
   const [userPosts, setUserPosts] = useState([]);
+  const [userId, setUserId] = useState(null); // State to manage the unwrapped `params.id`
+
+  useEffect(() => {
+    // Unwrap `params.id` safely
+    const unwrapParams = async () => {
+      const id = await params?.id; // Await the `params` object
+      setUserId(id);
+    };
+
+    unwrapParams();
+  }, [params]);
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch(`/api/users/${params?.id}/posts`);
-      const data = await response.json();
+      if (!userId) return;
 
-      setUserPosts(data);
+      try {
+        const response = await fetch(`/api/users/${userId}/posts`);
+        const data = await response.json();
+        setUserPosts(data);
+      } catch (error) {
+        console.error("Failed to fetch user posts:", error);
+      }
     };
 
-    if (params?.id) fetchPosts();
-  }, [params.id]);
+    fetchPosts();
+  }, [userId]);
 
   return (
     <Profile
       name={userName}
-      desc={`Welcome to ${userName}'s personalized profile page. Explore ${userName}'s exceptional prompts and be inspired by the power of their imagination`}
+      desc={`Welcome to ${userName}'s personalized profile page. Explore ${userName}'s exceptional prompts and be inspired by the power of their imagination.`}
       data={userPosts}
     />
   );
