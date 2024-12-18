@@ -2,7 +2,6 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import Form from "@components/Form";
 
 const UpdatePrompt = () => {
@@ -36,6 +35,9 @@ const UpdatePrompt = () => {
     try {
       const response = await fetch(`/api/prompt/${promptId}`, {
         method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           prompt: post.prompt,
           tag: post.tag,
@@ -53,16 +55,21 @@ const UpdatePrompt = () => {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Form
-        type="Edit"
-        post={post}
-        setPost={setPost}
-        submitting={submitting}
-        handleSubmit={updatePrompt}
-      />
-    </Suspense>
+    <Form
+      type="Edit"
+      post={post}
+      setPost={setPost}
+      submitting={submitting}
+      handleSubmit={updatePrompt}
+    />
   );
 };
 
-export default UpdatePrompt;
+// Use Suspense around the client-side component
+const WrappedUpdatePrompt = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <UpdatePrompt />
+  </Suspense>
+);
+
+export default WrappedUpdatePrompt;
